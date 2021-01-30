@@ -4,26 +4,21 @@ var DIST_DIR = path.join(__dirname, '/client/dist');
 
 module.exports = {
   entry: `${SRC_DIR}/index.jsx`,
+  devtool: 'source-map',
   output: {
     filename: 'bundle.js',
     path: DIST_DIR
   },
-  module : {
+  module: {
     rules: [
-      {
-        test: /\.jsx$/,
+      { 
+        test: [/\.jsx$/],
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-react', '@babel/preset-env'],
-          },
-        },
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      },
-    ],
+        loader: 'babel-loader',
+        query: {
+          presets: ['env', 'react'],
+        }
+      }
+    ]
   }
 };

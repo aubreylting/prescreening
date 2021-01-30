@@ -8,14 +8,18 @@ class App extends React.Component {
 
     this.state = {
       originalData: [],
-      filteredData: []
+      filteredData: [],
+      departmentSelected: false,
+      ageSelected: false
     };
   }
 
   componentDidMount() {
     this.setState({
       originalData: EmployeeData,
-      filteredData: EmployeeData
+      filteredData: EmployeeData,
+      departmentSelected: false,
+      ageSelected: false
     });
   }
 
@@ -24,7 +28,7 @@ class App extends React.Component {
     let aux = JSON.parse(JSON.stringify(this.state.originalData));
 
     if (name!== "") {
-      aux = aux.filter(row => row.name.includes(name));
+      aux = aux.filter(row => row.name.toLowerCase().includes(name.toLowerCase()));
     }
 
     this.setState({
@@ -34,36 +38,51 @@ class App extends React.Component {
 
   handleSelectedDepartment(department) {
     //console.log(department);
-    let aux = JSON.parse(JSON.stringify(this.state.filteredData));
+    let aux = JSON.parse(JSON.stringify(this.state.originalData));
+    let auxSelected = this.state.filteredData;
 
-    if (department!== "") {
+    if (department!== "" && !this.state.ageSelected) {
       aux = aux.filter(row => row.department === department);
-    }else{
+    } else if (department!== "" && this.state.ageSelected){
+      aux = auxSelected.filter(row => row.department === department)
+    } else {
       aux = this.state.originalData
     }
 
     this.setState({
-      filteredData: aux
+      filteredData: aux,
+      departmentSelected: true
     });
   }
 
   handleSelectedAge(age) {
-    let aux = JSON.parse(JSON.stringify(this.state.filteredData));
+    let aux = JSON.parse(JSON.stringify(this.state.originalData));
+    let auxSelected = this.state.filteredData;
 
-    if (age === "20") {
+    if (age === "20" && !this.state.departmentSelected) {
       aux = aux.filter(row => (row.age >= 20 && row.age <30));
     }
-    else if (age === "30") {
+    else if (age === "30" && !this.state.departmentSelected) {
       aux = aux.filter(row => (row.age >= 30 && row.age <40));
     }
-    else if (age === "40") {
+    else if (age === "40" && !this.state.departmentSelected ) {
       aux = aux.filter(row => (row.age >= 40 && row.age <50));
-    } else{
+    }
+    else if (age === "20" && this.state.departmentSelected) {
+      aux = auxSelected.filter(row => (row.age >= 20 && row.age <30));
+    }
+    else if (age === "30" && this.state.departmentSelected) {
+      aux = auxSelected.filter(row => (row.age >= 30 && row.age <40));
+    }
+    else if (age === "40" && this.state.departmentSelected ) {
+      aux = auxSelected.filter(row => (row.age >= 40 && row.age <50));
+    } else {
       aux = this.state.originalData
     }
-
+    
     this.setState({
-      filteredData: aux
+      filteredData: aux,
+      ageSelected: true
     });
   }
   
@@ -72,32 +91,42 @@ class App extends React.Component {
 
     return (
       <div>
-        <input type="text" placeholder="Search by Name" onChange={(e)=>this.searchName(e.target.value)} />
-        Department: <select onChange={e => this.handleSelectedDepartment(e.target.value)}>
+        <li>
+        <input className="search-wrapper cf" type="text" placeholder="Search by Name" onChange={(e)=>this.searchName(e.target.value)} />
+        Department: <select className="select-dropdown" onChange={e => this.handleSelectedDepartment(e.target.value)}>
           <option />
           <option>Music</option>
           <option>Film</option>
           <option>Sports</option>
         </select>
-        Age: <select onChange={e => this.handleSelectedAge(e.target.value)}>
+        Age: <select  className="select-dropdown" onChange={e => this.handleSelectedAge(e.target.value)}>
           <option />
           <option value ='20'>20-30</option>
           <option value ='30'>30-40</option>
           <option value ='40'>40-50</option>
         </select>
-        {this.state.filteredData.map(data=>{
-          return(
-          <div key = {data.name}>
-            <ul>
-              <li>
-                <span style = {{paddingRight:'10px'}}>{data.name}</span>
-                <span style = {{paddingRight:'10px'}}>{data.department}</span>
-                <span style = {{paddingRight:'10px'}}>{data.age}</span>
-              </li>
-            </ul>
-          </div>
-          )
-        })}
+        <button onClick ={() => this.componentDidMount()} >Refresh</button>
+        </li>
+        <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Age</th>
+              </tr>
+            </thead>
+            <tbody>              
+                {this.state.filteredData.map(data=>{
+                return(
+                  <tr key = {data.name}>
+                    <td data-column="Name">{data.name}</td>
+                    <td data-column="Department">{data.department}</td>
+                    <td data-column="Age">{data.age}</td>
+                  </tr>
+                )
+                })}
+            </tbody>
+          </table>
       </div>
     );
   }
